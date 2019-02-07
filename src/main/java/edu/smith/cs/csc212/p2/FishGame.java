@@ -42,6 +42,16 @@ public class FishGame {
 	 * Score!
 	 */
 	int score;
+
+	/**
+	 * Number of rocks!
+	 */
+	public static final int NUM_ROCKS = 10;
+	
+	/**
+	 * Number of rocks that fall!
+	 */
+	public static final int NUM_FALLING_ROCKS = 10;
 	
 	/**
 	 * Create a FishGame of a particular size.
@@ -57,13 +67,17 @@ public class FishGame {
 		// Add a home!
 		home = world.insertFishHome();
 		
-		// TODO(lab) Generate some more rocks!
-		// TODO(lab) Make 5 into a constant, so it's easier to find & change.
-		for (int i=0; i<5; i++) {
+		// Generate some more rocks!
+		for (int i=0; i<NUM_ROCKS; i++) {
 			world.insertRockRandomly();
 		}
 		
-		// TODO(lab) Make the snail!
+		for (int i=0; i<NUM_FALLING_ROCKS; i++) {
+			world.insertFallingRockRandomly();
+		}
+		
+		// Make the snail!
+		world.insertSnailRandomly();
 		
 		// Make the player out of the 0th fish color.
 		player = new Fish(0, world);
@@ -116,9 +130,8 @@ public class FishGame {
 				// Remove this fish from the missing list.
 				missing.remove(wo);
 				
-				// Remove from world.
-				// TODO(lab): add to found instead! (So we see objectsFollow work!)
-				world.remove(wo);
+				// Add to found!
+				found.add((Fish) wo);
 				
 				// Increase score when you find a fish!
 				score += 10;
@@ -139,9 +152,10 @@ public class FishGame {
 	private void wanderMissingFish() {
 		Random rand = ThreadLocalRandom.current();
 		for (Fish lost : missing) {
-			// 30% of the time, lost fish move randomly.
-			if (rand.nextDouble() < 0.3) {
-				// TODO(lab): What goes here?
+			// Chance of fish being scared is determined by the variable scareChance that Fish has.
+			// Is either 0.8 or 0.3 but could make it randomly.
+			if (rand.nextDouble() < lost.scareChance) {
+				lost.moveRandomly();
 			}
 		}
 	}

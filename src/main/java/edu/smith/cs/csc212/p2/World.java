@@ -151,6 +151,17 @@ public class World {
 	}
 	
 	/**
+	 * Insert a falling rock randomly.
+	 * @return FallingRock, the rock that falls.
+	 */
+	//TODO: Make it spawns from the top only?
+	public FallingRock insertFallingRockRandomly() {
+		FallingRock r = new FallingRock(this);
+		insertRandomly(r);
+		return r;
+	}
+	
+	/**
 	 * Insert a new Fish into the world at random of a specific color.
 	 * @param color - the color of the fish.
 	 * @return the new fish itself.

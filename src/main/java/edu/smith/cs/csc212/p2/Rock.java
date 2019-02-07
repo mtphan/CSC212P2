@@ -28,7 +28,7 @@ public class Rock extends WorldObject {
 	};
 	
 	/**
-	 * Index of the color for rock.
+	 * This is an index into the {@link #ROCK_COLORS} array.
 	 */
 	int color;
 	
@@ -40,7 +40,6 @@ public class Rock extends WorldObject {
 		super(world);
 		// Initialize color.
 		color = rand.nextInt(ROCK_COLORS.length);
-		// Note that all WorldObjects have a ``rand`` available so you don't need to make one.
 	}
 
 	/**

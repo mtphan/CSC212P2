@@ -19,19 +19,25 @@ public class Fish extends WorldObject {
 			Color.red,
 			Color.green,
 			Color.yellow,
-			Color.blue,
+			Color.white,
 			Color.magenta,
-			Color.orange
+			Color.orange.darker()
 			// TODO: (P2) Maybe make a special fish that is more points?
 	};
 	/**
 	 * This is an index into the {@link #COLORS} array.
 	 */
 	int color;
+	
 	/**
 	 * Whether or not this is the player;
 	 */
 	boolean player = false;
+	
+	/**
+	 * Chance of being scared.
+	 */
+	public double scareChance;
 	
 	/**
 	 * Called only on the Fish that is the player!
@@ -49,6 +55,12 @@ public class Fish extends WorldObject {
 	public Fish(int color, World world) {
 		super(world);
 		this.color = color;
+		// Pick chance of fish being scared here.
+		if (rand.nextBoolean()) {
+			scareChance = 0.3;
+		} else {
+			scareChance = 0.8;
+		}
 	}
 	
 	/**
