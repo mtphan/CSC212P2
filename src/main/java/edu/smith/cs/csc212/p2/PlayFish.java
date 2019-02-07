@@ -17,11 +17,11 @@ import me.jjfoley.gfx.TextBox;
  */
 public class PlayFish extends GFX {
 	/**
-	 * Game size (visual). Try changing this to 600.
+	 * Game size (visual). TODO Try changing this to 600.
 	 */
 	public static int VISUAL_GRID_SIZE = 600;
 	/**
-	 * Game size (logical).
+	 * Game size (logical). TODO Try changing this to 15 or so.
 	 */
 	public static int LOGICAL_GRID_SIZE = 15;
 	/**
