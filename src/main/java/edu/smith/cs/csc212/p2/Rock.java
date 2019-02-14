@@ -38,7 +38,7 @@ public class Rock extends WorldObject {
 	 */
 	public Rock(World world) {
 		super(world);
-		// Initialize color.
+		// Initialize color index.
 		color = rand.nextInt(ROCK_COLORS.length);
 	}
 

@@ -17,17 +17,28 @@ public class Fish extends WorldObject {
 	 */
 	public static Color[] COLORS = {
 			Color.red,
-			Color.green,
+			Color.green.darker(),
 			Color.yellow,
-			Color.white,
 			Color.magenta,
-			Color.orange.darker()
-			// TODO: (P2) Maybe make a special fish that is more points?
+			Color.orange.darker(),
+			Color.white,
+			Color.cyan,
+			Color.pink
 	};
 	/**
 	 * This is an index into the {@link #COLORS} array.
 	 */
 	int color;
+	
+	/**
+	 * Stores the value of the fish - score achieved if this fish is caught.
+	 */
+	public int value;
+	
+	/**
+	 * 
+	 */
+	private int stepsTillBored = 20 + rand.nextInt(5);
 	
 	/**
 	 * Whether or not this is the player;
@@ -55,12 +66,19 @@ public class Fish extends WorldObject {
 	public Fish(int color, World world) {
 		super(world);
 		this.color = color;
+		
 		// Pick chance of fish being scared here.
 		if (rand.nextBoolean()) {
 			scareChance = 0.3;
 		} else {
 			scareChance = 0.8;
 		}
+		
+		// Give score based on how green it is. Magenta gives highest score. There are some elements of randomness.
+		// More points for fish with higher scare chance.
+		this.value = (int) ((10000/(getColor().getGreen()+100) + rand.nextInt(10)) * (scareChance*10));
+		// Round it to the nearest 10 because it looks nicer that way.
+		this.value = (this.value / 10)*10;
 	}
 	
 	/**
@@ -117,6 +135,29 @@ public class Fish extends WorldObject {
 		flipped.fill(tail);
 		
 		flipped.dispose();
+	}
+	
+	/**
+	 * Increases fish's boredomness.
+	 */
+	public void increaseBoredom() {
+		this.stepsTillBored -= 1;
+	}
+	
+	/**
+	 * Check if fish is bored.
+	 * @return true if stepsTillBored <= 0.
+	 */
+	public boolean isBored() {
+		if (this.stepsTillBored <= 0) return true;
+		return false;
+	}
+	
+	/**
+	 * Reset its stepsTillBoredom variable. Doesn't have to reset to original number.
+	 */
+	public void resetBoredom() {
+		this.stepsTillBored = 20 + rand.nextInt(5);
 	}
 	
 	@Override

@@ -151,10 +151,9 @@ public class World {
 	}
 	
 	/**
-	 * Insert a falling rock randomly.
+	 * Insert a falling rock randomly. Could use chances but I prefer being able to control the number of it.
 	 * @return FallingRock, the rock that falls.
 	 */
-	//TODO: Make it spawns from the top only?
 	public FallingRock insertFallingRockRandomly() {
 		FallingRock r = new FallingRock(this);
 		insertRandomly(r);
@@ -176,6 +175,12 @@ public class World {
 		FishHome home = new FishHome(this);
 		insertRandomly(home);
 		return home;
+	}
+	
+	public FishFood insertFishFood() {
+		FishFood food = new FishFood(this);
+		insertRandomly(food);
+		return food;
 	}
 	
 	/**
@@ -208,10 +213,13 @@ public class World {
 		List<WorldObject> inSpot = this.find(x, y);
 		
 		for (WorldObject it : inSpot) {
-			// TODO(P2): Don't let us move over rocks as a Fish.
 			// The other fish shouldn't step "on" the player, the player should step on the other fish.
-			if (it instanceof Snail) {
-				// This if-statement doesn't let anyone step on the Snail.
+			if (isPlayer && it.isFish()) {
+				return true;
+			}
+			if (it instanceof Snail || it instanceof Rock || it instanceof Fish) {
+				// This if-statement doesn't let anyone step on the Snail or Rock.
+				// Also won't let fish step on each other or step on the player.
 				// The Snail(s) are not gonna take it.
 				return false;
 			}
@@ -237,11 +245,15 @@ public class World {
 	 * @param followers a set of objects to follow the leader.
 	 */
 	public static void objectsFollow(WorldObject target, List<? extends WorldObject> followers) {
-		// TODO(P2) Comment this method!
-		// What is recentPositions?
-		// What is followers?
-		// What is target?
+		// recentPosition = List of position IntPoint that the target has passed through.
+		// 					Is used to decide the points for the followers to go to.
+		// followers = A list of things that is a subclass of WorldObject (Fish in this case).
+		//			   Follows the target.
+		// target = Leaders of the follower (player in this case).
+		//			The follower follows the path the leader travels.
 		// Why is past = putWhere[i+1]? Why not putWhere[i]?
+		// putWhere[0] stores current position of the target.
+		// => All followers has to use position at putWhere[i+1] or else one of them will step on the target.
 		List<IntPoint> putWhere = new ArrayList<>(target.recentPositions);
 		for (int i=0; i<followers.size(); i++) {
 			IntPoint past = putWhere.get(i+1);

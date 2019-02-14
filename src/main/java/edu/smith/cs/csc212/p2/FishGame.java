@@ -23,6 +23,12 @@ public class FishGame {
 	 * The home location.
 	 */
 	FishHome home;
+	
+	/**
+	 * The food location.
+	 */
+	FishFood food;
+	
 	/**
 	 * These are the missing fish!
 	 */
@@ -46,12 +52,12 @@ public class FishGame {
 	/**
 	 * Number of rocks!
 	 */
-	public static final int NUM_ROCKS = 10;
+	public static final int NUM_ROCKS = 20;
 	
 	/**
 	 * Number of rocks that fall!
 	 */
-	public static final int NUM_FALLING_ROCKS = 10;
+	public static final int NUM_FALLING_ROCKS = 20;
 	
 	/**
 	 * Create a FishGame of a particular size.
@@ -72,12 +78,16 @@ public class FishGame {
 			world.insertRockRandomly();
 		}
 		
+		// Generate falling rocks!
 		for (int i=0; i<NUM_FALLING_ROCKS; i++) {
 			world.insertFallingRockRandomly();
 		}
 		
 		// Make the snail!
 		world.insertSnailRandomly();
+		
+		// Add fish food in?
+		food = world.insertFishFood();
 		
 		// Make the player out of the 0th fish color.
 		player = new Fish(0, world);
@@ -103,11 +113,59 @@ public class FishGame {
 	}
 	
 	/**
+	 * Check if the player has got home. Remove all following fish if it did get home.
+	 * Also check if other fish got home by accident.
+	 * @return true if player reaches home.
+	 */
+	public boolean reachHome() {
+		// Variable to check if player reaches home
+		boolean playerReachesHome = false;
+		
+		// List of things that are currently at home.
+		List<WorldObject> thingsAtHome = this.home.findSameCell();
+		thingsAtHome.remove(home);
+		
+		// If player is at home
+		if (thingsAtHome.remove(player)) {
+			playerReachesHome = true;
+			// Remove fish in found from the world
+			eatFish(found);
+		}
+		
+		// Remove fish at home from the world.
+		eatFish(thingsAtHome);
+		
+		return playerReachesHome;
+		
+	}
+	
+	/**
+	 * Remove a bunch of fish. Actually only use when the fish reaches home.
+	 * @param fishToEat - List of fish to remove from absolutely everything.
+	 */
+	private void eatFish(List<? extends WorldObject> fishToEat) {
+		// Make an array to remove stuff in case of ModifiedConcurrentError something.
+		List<Fish> home = new ArrayList<>();
+		for (WorldObject it : fishToEat) {
+			// Only eat if it's a fish.
+			if (it instanceof Fish) {
+				home.add((Fish) it);
+				world.remove(it);
+			}
+		}
+		missing.removeAll(home);
+		found.removeAll(home);
+	}
+	
+	/**
 	 * This method is how the PlayFish app tells whether we're done.
 	 * @return true if the player has won (or maybe lost?).
 	 */
 	public boolean gameOver() {
-		// TODO(P2) We want to bring the fish home before we win!
+		// If player hasn't reach home, it's always a false.
+		if (!reachHome()) {
+			return false;
+		}
 		return missing.isEmpty();
 	}
 
@@ -117,7 +175,7 @@ public class FishGame {
 	public void step() {
 		// Keep track of how long the game has run.
 		this.stepsTaken += 1;
-				
+		
 		// These are all the objects in the world in the same cell as the player.
 		List<WorldObject> overlap = this.player.findSameCell();
 		// The player is there, too, let's skip them.
@@ -133,10 +191,28 @@ public class FishGame {
 				// Add to found!
 				found.add((Fish) wo);
 				
-				// Increase score when you find a fish!
-				score += 10;
+				// Increase score when you find a fish according to the fish value!
+				score += ((Fish) wo).value;
 			}
 		}
+		
+		List<WorldObject> potentialEater = this.food.findSameCell();
+		potentialEater.remove(food);
+		
+		for (WorldObject eater : potentialEater) {
+			if (eater.isFish()) {
+				food.setPosition(world.pickUnusedSpace());
+				food.resetTimer();
+				if (eater.isPlayer()) {
+					score += 10;
+				}
+			}
+			// Only 1 fish is enough to be eaten.
+			break;
+		}
+		
+		// Make fish in found get bored.
+		makeFishBored();
 		
 		// Make sure missing fish *do* something.
 		wanderMissingFish();
@@ -159,6 +235,23 @@ public class FishGame {
 			}
 		}
 	}
+	
+	/**
+	 * Increase the boredom of fish (decrease its stepsTillBored variable).
+	 * Remove it from found and add it to missing if it got bored.
+	 */
+	private void makeFishBored() {
+		// Loop backwards.
+		for (int i = found.size()-1; i>1; i--) {
+			found.get(i).increaseBoredom();
+			// If fish is bored. Fish at position 0 and 1 never gets bored because it's not "too far back".
+			if (found.get(i).isBored()) {
+				missing.add(found.get(i));
+				found.get(i).resetBoredom();
+				found.remove(i);
+			}
+		}
+	}
 
 	/**
 	 * This gets a click on the grid. We want it to destroy rocks that ruin the game.
@@ -166,10 +259,15 @@ public class FishGame {
 	 * @param y - the y-tile.
 	 */
 	public void click(int x, int y) {
-		// TODO(P2) use this print to debug your World.canSwim changes!
 		System.out.println("Clicked on: "+x+","+y+ " world.canSwim(player,...)="+world.canSwim(player, x, y));
 		List<WorldObject> atPoint = world.find(x, y);
-		// TODO(P2) allow the user to click and remove rocks.
+		// Loop through all found objects.
+		for (WorldObject it : atPoint) {
+			// Remove if an instance of Rock.
+			if (it instanceof Rock) {
+				world.remove(it);
+			}
+		}
 
 	}
 	

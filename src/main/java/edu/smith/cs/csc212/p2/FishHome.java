@@ -24,6 +24,7 @@ public class FishHome extends WorldObject {
 		super(world);
 		
 		// I drew this out on graph paper.
+		// Thank you!
 		roof = new Polygon();
 		roof.addPoint(1, 4);
 		roof.addPoint(9, 4);
@@ -56,7 +57,7 @@ public class FishHome extends WorldObject {
 
 	@Override
 	public void step() {
-		// Fish home doesn't move, does it?
+		// Fish home doesn't move, does it? - Probably?
 	}
 
 }
