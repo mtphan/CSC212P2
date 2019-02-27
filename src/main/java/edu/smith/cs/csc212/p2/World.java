@@ -217,10 +217,21 @@ public class World {
 			if (isPlayer && it.isFish()) {
 				return true;
 			}
+			// Gish can go on fish food.
+			if (whoIsAsking instanceof Fish && it instanceof FishFood) {
+				return true;
+			}
+			
+			// When fishfood is visible nothing other than fish can step on it.
+			if (it instanceof FishFood) {
+				if (((FishFood) it).isVisible()) {
+					return false;
+				}
+			}
+			
 			if (it instanceof Snail || it instanceof Rock || it instanceof Fish) {
 				// This if-statement doesn't let anyone step on the Snail or Rock.
 				// Also won't let fish step on each other or step on the player.
-				// The Snail(s) are not gonna take it.
 				return false;
 			}
 		}

@@ -39,6 +39,15 @@ public class FishFood extends WorldObject {
 		}
 	}
 	
+	/**
+	 * Return if food is on screen or not.
+	 * @return true if food is on screen, false if not.
+	 */
+	public boolean isVisible() {
+		if (timer >= eatTime) return true;
+		else return false;
+	}
+	
 	public void resetTimer() {
 		this.timer = 0;
 		// New time to eat.

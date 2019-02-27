@@ -128,6 +128,8 @@ public class FishGame {
 		// If player is at home
 		if (thingsAtHome.remove(player)) {
 			playerReachesHome = true;
+			// Add all fish rescued to score.
+			addScore(found);
 			// Remove fish in found from the world
 			eatFish(found);
 		}
@@ -137,6 +139,16 @@ public class FishGame {
 		
 		return playerReachesHome;
 		
+	}
+	
+	/**
+	 * Add all fish to score.
+	 * @param fishToAdd - list of fish with different value.
+	 */
+	private void addScore(List<Fish> fishToAdd) {
+		for (Fish fish : fishToAdd) {
+			score += fish.value;
+		}
 	}
 	
 	/**
@@ -190,9 +202,6 @@ public class FishGame {
 				
 				// Add to found!
 				found.add((Fish) wo);
-				
-				// Increase score when you find a fish according to the fish value!
-				score += ((Fish) wo).value;
 			}
 		}
 		
@@ -200,7 +209,8 @@ public class FishGame {
 		potentialEater.remove(food);
 		
 		for (WorldObject eater : potentialEater) {
-			if (eater.isFish()) {
+			// Prevent fish eating food when food is not drawn yet.
+			if (eater.isFish() && food.isVisible()) {
 				food.setPosition(world.pickUnusedSpace());
 				food.resetTimer();
 				if (eater.isPlayer()) {
@@ -268,7 +278,5 @@ public class FishGame {
 				world.remove(it);
 			}
 		}
-
 	}
-	
 }
